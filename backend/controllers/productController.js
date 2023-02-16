@@ -235,6 +235,9 @@ const adminUpload = async (req, res, next) => {
       "images",
       "products"
     );
+
+    let product = await Product.findById(req.query.productId).orFail();
+
     let imagesTable = [];
 
     if (Array.isArray(req.files.images)) {
@@ -243,17 +246,43 @@ const adminUpload = async (req, res, next) => {
       imagesTable.push(req.files.images);
     }
     for (let image of imagesTable) {
-      var uploadPath =
-        uploadDirectory + "/" + uuidv4() + path.extname(image.name);
+      var fileName = uuidv4() + path.extname(image.name);
+      var uploadPath = uploadDirectory + "/" + fileName;
+      product.images.push({ path: "/images/products/" + fileName });
+
       image.mv(uploadPath, function (error) {
         if (error) {
           return res.status(500).send(error);
         }
       });
     }
+    await product.save();
     return res.send("Files uploaded!");
   } catch (err) {
     next(err);
+  }
+};
+
+//Admin Delete Product Image
+const adminDeleteProductImage = async (req, res, next) => {
+  try {
+    const imagePath = decodeURIComponent(req.params.imagePath);
+    const path = require("path");
+    const finalPath = path.resolve("../frontend/public") + imagePath;
+
+    const fs = require("fs");
+    fs.unlink(finalPath, (err) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
+    await Product.findOneAndUpdate(
+      { _id: req.params.productId },
+      { $pull: { images: { path: imagePath } } }
+    ).orFail();
+    return res.end();
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -266,4 +295,5 @@ module.exports = {
   adminCreateProduct,
   adminUpdateProduct,
   adminUpload,
+  adminDeleteProductImage,
 };
