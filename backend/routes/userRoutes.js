@@ -11,6 +11,9 @@ const {
   updateUserProfile,
   getUserProfile,
   writeReview,
+  getUser,
+  updateUser,
+  deleteUser,
 } = require("../controllers/userController");
 
 router.post("/register", registerUser);
@@ -24,5 +27,8 @@ router.post("/review/:productId", writeReview)
 //admin routes
 router.use(verifyIsAdmin);
 router.get("/", getUsers);
+router.get("/:id", getUser)
+router.put("/:id", updateUser)
+router.delete("/:id", deleteUser)
 
 module.exports = router;
