@@ -35,7 +35,7 @@ const UserProfilePage = () => {
                 required
                 type="text"
                 defaultValue="John"
-                name="name"
+                name="firstName"
               />
               <Form.Control.Feedback type="invalid">
                 Please enter a name

@@ -1,4 +1,5 @@
 const User = require("../models/UserModel");
+const Review = require("../models/ReviewModel")
 const { hashPassword, comparePasswords } = require("../utils/hashPassword");
 const generateAuthToken = require("../utils/generateAuthToken");
 
@@ -36,7 +37,7 @@ const registerUser = async (req, res, next) => {
           "access_token",
           generateAuthToken(
             user._id,
-            user.name,
+            user.firstName,
             user.lastName,
             user.email,
             user.isAdmin
@@ -75,7 +76,6 @@ const loginUser = async (req, res, next) => {
     const user = await User.findOne({ email });
     // Compare passwords or validate password
     if (user && comparePasswords(password, user.password)) {
-      
       let cookieParams = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -91,7 +91,7 @@ const loginUser = async (req, res, next) => {
           "access_token",
           generateAuthToken(
             user._id,
-            user.name,
+            user.firstName,
             user.lastName,
             user.email,
             user.isAdmin
@@ -102,7 +102,7 @@ const loginUser = async (req, res, next) => {
           success: "user logged in",
           userLoggedIn: {
             _id: user._id,
-            name: user.name,
+            name: user.firstName,
             lastName: user.lastName,
             email: user.email,
             isAdmin: user.isAdmin,
@@ -117,4 +117,82 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsers, registerUser, loginUser };
+//update user profile
+
+const updateUserProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id).orFail();
+    user.firstName = req.body.firstName || user.firstName;
+    user.lastName = req.body.lastName || user.lastName;
+    user.email = req.body.email || user.email;
+    user.phoneNumber = req.body.phoneNumber;
+    user.address = req.body.address;
+    user.country = req.body.country;
+    user.zipCode = req.body.zipCode;
+    user.city = req.body.city;
+    user.state = req.body.state;
+    if (req.body.password !== user.password) {
+      user.password = hashPassword(req.body.password);
+    }
+    await user.save();
+
+    res.json({
+      success: "user updated",
+      userUpdated: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getUserProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).orFail();
+    return res.send(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//User reviews
+
+const writeReview = async (req, res, next) => {
+  try {
+    //get comment, rating from request.body
+    const { comment, rating } = req.body;
+    //validate request:
+    if (!(comment && rating)) {
+      return res.status(400).send("All inputs are required");
+    }
+    //create review id manually because it is needed also for saving in Product collection
+    const ObjectId = require("mongodb").ObjectId
+    let reviewId = ObjectId();
+
+    await Review.create([
+      {
+        _id: reviewId,
+        comment: comment,
+        rating: Number(rating),
+        user: {_id: req.user._id, name: req.user.firstName + " " + req.user.lastName}
+      }
+    ])
+    res.send("review created")
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getUsers,
+  registerUser,
+  loginUser,
+  updateUserProfile,
+  getUserProfile,
+  writeReview,
+};
