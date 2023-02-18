@@ -155,7 +155,7 @@ const adminDeleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id).orFail();
     await product.remove();
-    res.json({ message: "product removed" });
+    res.json({ message: "product deleted" });
   } catch (error) {
     next(error);
   }
