@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import CartItemComponent from "../../components/CartItemComponent";
 
-const UserOrderDetailsPage = () => {
+const UserOrderDetails = () => {
   return (
     <Container fluid>
       <Row className="mt-4">
@@ -26,7 +26,7 @@ const UserOrderDetailsPage = () => {
             <Col md={6}>
               <h2>Payment method</h2>
               <Form.Select disabled={false}>
-                <option value="pp">Stripe</option>
+                <option value="pp">PayPal</option>
                 <option value="cod">
                   Cash On Delivery (delivery may be delayed)
                 </option>
@@ -49,7 +49,16 @@ const UserOrderDetailsPage = () => {
           <h2>Order items</h2>
           <ListGroup variant="flush">
             {Array.from({ length: 3 }).map((item, idx) => (
-              <CartItemComponent key={idx} />
+              <CartItemComponent
+                item={{
+                  image: { path: "/images/tablets-category.png" },
+                  name: "Product name",
+                  price: 10,
+                  count: 10,
+                  quantity: 10,
+                }}
+                key={idx}
+              />
             ))}
           </ListGroup>
         </Col>
@@ -84,4 +93,4 @@ const UserOrderDetailsPage = () => {
   );
 };
 
-export default UserOrderDetailsPage;
+export default UserOrderDetails;
