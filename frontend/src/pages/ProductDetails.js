@@ -12,8 +12,17 @@ import AddedToCartMessage from "../components/AddedToCartMessage";
 import { Rating } from "react-simple-star-rating";
 import ImageZoom from "js-image-zoom";
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/actions/cartActions";
 
 const ProductDetails = () => {
+  const dispatch = useDispatch();
+  const addToCartHandler = () => {
+    dispatch(addToCart());
+  };
+
+  const products = useSelector((state) => state.cart.value);
+
   var options = {
     // width: 400,
     // zoomWidth: 500,
@@ -93,7 +102,9 @@ const ProductDetails = () => {
                   </Form.Select>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <Button variant="success">Add to Cart</Button>
+                  <Button onClick={addToCartHandler} variant="success">
+                    Add to Cart
+                  </Button>
                 </ListGroup.Item>
               </ListGroup>
             </Col>
