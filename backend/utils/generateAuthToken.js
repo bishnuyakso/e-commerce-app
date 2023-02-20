@@ -7,4 +7,4 @@ const generateAuthToken = (_id, firstName, lastName, email, isAdmin) => {
     { expiresIn: "7h" }
   );
 };
-module.exports = generateAuthToken
+module.exports = generateAuthToken;
