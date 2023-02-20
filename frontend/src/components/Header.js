@@ -12,8 +12,12 @@ import {
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Link } from "react-router-dom";
+import { logout } from "../redux/actions/userActions";
+import { useDispatch } from "react-redux";
 
 const Header = () => {
+  const dispatch = useDispatch();
+
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
@@ -57,7 +61,9 @@ const Header = () => {
                 My profile
               </NavDropdown.Item>
 
-              <NavDropdown.Item>Logout</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => dispatch(logout())}>
+                Logout
+              </NavDropdown.Item>
             </NavDropdown>
 
             <LinkContainer to="/login">
@@ -74,7 +80,7 @@ const Header = () => {
                   2
                 </Badge>
                 <i className="bi bi-cart-dash"></i>
-                 <span className="ms-1">CART</span>
+                <span className="ms-1">CART</span>
               </Nav.Link>
             </LinkContainer>
           </Nav>

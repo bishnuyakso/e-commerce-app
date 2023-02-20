@@ -1,21 +1,15 @@
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Spinner from "react-bootstrap/Spinner";
 
-const LoginPageComponent = ({
-  loginUserApiRequest,
-  reduxDispatch,
-  setReduxUserState,
-}) => {
+const LoginPageComponent = ({ loginUserApiRequest,reduxDispatch, setReduxUserState  }) => {
   const [validated, setValidated] = useState(false);
   const [loginUserResponseState, setLoginUserResponseState] = useState({
     success: "",
     error: "",
     loading: false,
   });
-
-  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -27,35 +21,27 @@ const LoginPageComponent = ({
     const doNotLogout = form.doNotLogout.checked;
 
     if (event.currentTarget.checkValidity() === true && email && password) {
-      setLoginUserResponseState({ loading: true });
+        setLoginUserResponseState({ loading: true });
       loginUserApiRequest(email, password, doNotLogout)
         .then((res) => {
-          setLoginUserResponseState({
-            success: res.success,
-            loading: false,
-            error: "",
-          });
+            setLoginUserResponseState({ success: res.success, loading: false, error: "" });
 
-          if (res.userLoggedIn) {
-            reduxDispatch(setReduxUserState(res.userLoggedIn));
-          }
+            if (res.userLoggedIn) {
+                reduxDispatch(setReduxUserState(res.userLoggedIn));
+            }
 
-          if (res.success === "user logged in" && !res.userLoggedIn.isAdmin)
-            navigate("/user", { replace: true });
-          else navigate("/admin/orders", { replace: true });
+            if (res.success === "user logged in" && !res.userLoggedIn.isAdmin) window.location.href = '/user'
+            else window.location.href = '/admin/orders'
+
         })
         .catch((er) =>
-          setLoginUserResponseState({
-            error: er.response.data.message
-              ? er.response.data.message
-              : er.response.data,
-          })
+          setLoginUserResponseState({ error: er.response.data.message ? er.response.data.message : er.response.data })
         );
     }
 
     setValidated(true);
   };
-
+  
   return (
     <Container>
       <Row className="mt-5 justify-content-md-center">
@@ -127,3 +113,4 @@ const LoginPageComponent = ({
 };
 
 export default LoginPageComponent;
+

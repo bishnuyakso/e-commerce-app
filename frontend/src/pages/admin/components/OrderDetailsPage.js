@@ -8,11 +8,14 @@ import {
   Button,
 } from "react-bootstrap";
 import CartItemComponent from "../../../components/CartItemComponent";
-
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import { logout } from "../../../redux/actions/userActions";
+import { useDispatch } from "react-redux";
+
 const OrderDetailsPage = ({ getOrder, markAsDelivered }) => {
+  const dispatch = useDispatch();
   const { id } = useParams();
 
   const [userInfo, setUserInfo] = useState({});
@@ -41,10 +44,11 @@ const OrderDetailsPage = ({ getOrder, markAsDelivered }) => {
         }
         setCartItems(order.cartItems);
       })
-      .catch((er) =>
-        console.log(
-          er.response.data.message ? er.response.data.message : er.response.data
-        )
+      .catch(
+        (er) => dispatch(logout())
+        // console.log(
+        //   er.response.data.message ? er.response.data.message : er.response.data
+        // )
       );
   }, [isDelivered, id]);
   return (
@@ -120,14 +124,20 @@ const OrderDetailsPage = ({ getOrder, markAsDelivered }) => {
               <div className="d-grid gap-2">
                 <Button
                   size="lg"
-                  onClick={() => 
+                  onClick={() =>
                     markAsDelivered(id)
-                    .then((res) => {
-                       if (res) {
-                          setIsDelivered(true); 
-                       } 
-                    })
-                    .catch(er => console.log(er.response.data.message ? er.response.data.message : er.response.data))
+                      .then((res) => {
+                        if (res) {
+                          setIsDelivered(true);
+                        }
+                      })
+                      .catch((er) =>
+                        console.log(
+                          er.response.data.message
+                            ? er.response.data.message
+                            : er.response.data
+                        )
+                      )
                   }
                   disabled={buttonDisabled}
                   variant="danger"
@@ -145,4 +155,3 @@ const OrderDetailsPage = ({ getOrder, markAsDelivered }) => {
 };
 
 export default OrderDetailsPage;
-

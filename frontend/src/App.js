@@ -9,7 +9,7 @@ import RoutesWithUserChat from "./components/user/RoutesWithUserChat";
 //publicly available pages:
 import Home from "./pages/Home";
 import ProductDetails from "./pages/ProductDetails";
-import Login from "./pages/Login";
+import Login from "./pages/LoginPage";
 import Register from "./pages/Register";
 import ProductList from "./pages/ProductList";
 import CartItems from "./pages/CartItems";
