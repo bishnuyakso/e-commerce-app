@@ -7,14 +7,15 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
     success: "",
     error: "",
   });
+  const [passwordsMatchState, setPasswordsMatchState] = useState(true)
 
   const onChange = () => {
     const password = document.querySelector("input[name=password]");
-    const confirm = document.querySelector("input[name=confirmPassword]");
-    if (confirm.value === password.value) {
-      confirm.setCustomValidity("");
+    const confirmPassword = document.querySelector("input[name=confirmPassword]");
+    if (confirmPassword.value === password.value) {
+      setPasswordsMatchState(true);
     } else {
-      confirm.setCustomValidity("Passwords do not match");
+        setPasswordsMatchState(false);
     }
   };
 
@@ -95,7 +96,7 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 disabled
-                value="john@doe.com   if you want to change email, remove account and create new one with new email address"
+                value="if you want to change email, remove account and create new one with new email address"
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPhone">
@@ -161,6 +162,7 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
                 placeholder="Password"
                 minLength={6}
                 onChange={onChange}
+                isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
                 Please anter a valid password
@@ -178,6 +180,7 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
                 placeholder="Repeat Password"
                 minLength={6}
                 onChange={onChange}
+                isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
                 Both passwords should match
