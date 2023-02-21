@@ -103,7 +103,7 @@ const loginUser = async (req, res, next) => {
           success: "user logged in",
           userLoggedIn: {
             _id: user._id,
-            name: user.firstName,
+            firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
             isAdmin: user.isAdmin,
