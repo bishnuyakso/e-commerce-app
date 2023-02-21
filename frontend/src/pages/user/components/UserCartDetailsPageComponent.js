@@ -8,24 +8,37 @@ import {
   Button,
 } from "react-bootstrap";
 import CartItemComponent from "../../../components/CartItemComponent";
+import { useEffect, useState } from "react";
 
-const UserCartDetailsPageComponent = ({
-  cartItems,
-  itemsCount,
-  cartSubtotal,
-  addToCart,
-  removeFromCart,
-  reduxDispatch,
-}) => {
-  const changeCount = (productID, count) => {
-    reduxDispatch(addToCart(productID, count));
-  };
+const UserCartDetailsPageComponent = ({cartItems, itemsCount, cartSubtotal, userInfo,addToCart, removeFromCart, reduxDispatch , getUser}) => {
 
-  const removeFromCartHandler = (productID, quantity, price) => {
-    if (window.confirm("Are you sure?")) {
-      reduxDispatch(removeFromCart(productID, quantity, price));
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+    const [userAddress, setUserAddress] = useState(false);
+    const [missingAddress, setMissingAddress] = useState("");
+
+    const changeCount = (productID, count) => {
+        reduxDispatch(addToCart(productID, count));
     }
-  };
+
+    const removeFromCartHandler = (productID, quantity, price) => {
+        if (window.confirm("Are you sure?")) {
+            reduxDispatch(removeFromCart(productID, quantity, price));
+        }
+    }
+
+    useEffect(() => {
+        getUser()
+        .then((data) => {
+            if (!data.address || !data.city || !data.country || !data.zipCode || !data.state || !data.phoneNumber) {
+                setButtonDisabled(true);
+                setMissingAddress(" .In order to make order, fill out your profile with correct address, city etc.");
+            } else {
+                setUserAddress({address: data.address, city: data.city, country: data.country, zipCode: data.zipCode, state: data.state, phoneNumber: data.phoneNumber})
+                setMissingAddress(false);
+            }
+        })
+        .catch((er) => console.log(er.response.data.message ? er.response.data.message : er.response.data));
+    }, [userInfo._id])
   return (
     <Container fluid>
       <Row className="mt-4">
@@ -35,9 +48,9 @@ const UserCartDetailsPageComponent = ({
           <Row>
             <Col md={6}>
               <h2>Shipping</h2>
-              <b>Name</b>: John Doe <br />
-              <b>Address</b>: 8739 Mayflower St. Los Angeles, CA 90063 <br />
-              <b>Phone</b>: 888 777 666
+              <b>Name</b>: {userInfo.firstName} {userInfo.lastName} <br />
+              <b>Address</b>: {userAddress.address} {userAddress.city} {userAddress.state} {userAddress.zipCode} <br />
+              <b>Phone</b>: {userAddress.phoneNumber}
             </Col>
             <Col md={6}>
               <h2>Payment method</h2>
@@ -51,8 +64,8 @@ const UserCartDetailsPageComponent = ({
             <Row>
               <Col>
                 <Alert className="mt-3" variant="danger">
-                  Not delivered. In order to make order, fill out your profile
-                  with correct address, city etc.
+                  Not delivered
+                  {missingAddress}
                 </Alert>
               </Col>
               <Col>
@@ -66,12 +79,7 @@ const UserCartDetailsPageComponent = ({
           <h2>Order items</h2>
           <ListGroup variant="flush">
             {cartItems.map((item, idx) => (
-              <CartItemComponent
-                item={item}
-                key={idx}
-                removeFromCartHandler={removeFromCartHandler}
-                changeCount={changeCount}
-              />
+              <CartItemComponent item={item} key={idx} removeFromCartHandler={removeFromCartHandler} changeCount={changeCount} />
             ))}
           </ListGroup>
         </Col>
@@ -81,8 +89,7 @@ const UserCartDetailsPageComponent = ({
               <h3>Order summary</h3>
             </ListGroup.Item>
             <ListGroup.Item>
-              Items price (after tax):{" "}
-              <span className="fw-bold">${cartSubtotal}</span>
+              Items price (after tax): <span className="fw-bold">${cartSubtotal}</span>
             </ListGroup.Item>
             <ListGroup.Item>
               Shipping: <span className="fw-bold">included</span>
@@ -95,7 +102,7 @@ const UserCartDetailsPageComponent = ({
             </ListGroup.Item>
             <ListGroup.Item>
               <div className="d-grid gap-2">
-                <Button size="lg" variant="danger" type="button">
+                <Button size="lg" variant="danger" type="button" disabled={buttonDisabled}>
                   Pay for the order
                 </Button>
               </div>
