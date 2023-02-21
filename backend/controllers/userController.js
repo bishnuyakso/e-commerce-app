@@ -125,7 +125,7 @@ const updateUserProfile = async (req, res, next) => {
     const user = await User.findById(req.user._id).orFail();
     user.firstName = req.body.firstName || user.firstName;
     user.lastName = req.body.lastName || user.lastName;
-    user.email = req.body.email || user.email;
+
     user.phoneNumber = req.body.phoneNumber;
     user.address = req.body.address;
     user.country = req.body.country;

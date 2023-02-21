@@ -3,6 +3,10 @@ import { useState } from "react";
 
 const UserProfileComponent = ({ updateUserApiRequest }) => {
   const [validated, setValidated] = useState(false);
+  const [updateUserResponseState, setUpdateUserResponseState] = useState({
+    success: "",
+    error: "",
+  });
 
   const onChange = () => {
     const password = document.querySelector("input[name=password]");
@@ -42,9 +46,17 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
         city,
         state,
         password
-      ).then(data => {
-        console.log(data);
-      });
+      )
+        .then((data) => {
+          setUpdateUserResponseState({ success: data.success, error: "" });
+        })
+        .catch((err) =>
+          setUpdateUserResponseState({
+            error: err.response.data.message
+              ? err.response.data.message
+              : err.response.data,
+          })
+        );
     }
 
     setValidated(true);
@@ -175,10 +187,21 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
             <Button variant="primary" type="submit">
               Update
             </Button>
-            <Alert show={true} variant="danger">
-              User with that email already exists!
+            <Alert
+              show={
+                updateUserResponseState && updateUserResponseState.error !== ""
+              }
+              variant="danger"
+            >
+              Something went wrong
             </Alert>
-            <Alert show={true} variant="info">
+            <Alert
+              show={
+                updateUserResponseState &&
+                updateUserResponseState.success === "user updated"
+              }
+              variant="info"
+            >
               User updated
             </Alert>
           </Form>
