@@ -7,15 +7,17 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
     success: "",
     error: "",
   });
-  const [passwordsMatchState, setPasswordsMatchState] = useState(true)
+  const [passwordsMatchState, setPasswordsMatchState] = useState(true);
 
   const onChange = () => {
     const password = document.querySelector("input[name=password]");
-    const confirmPassword = document.querySelector("input[name=confirmPassword]");
+    const confirmPassword = document.querySelector(
+      "input[name=confirmPassword]"
+    );
     if (confirmPassword.value === password.value) {
       setPasswordsMatchState(true);
     } else {
-        setPasswordsMatchState(false);
+      setPasswordsMatchState(false);
     }
   };
 
@@ -165,7 +167,7 @@ const UserProfileComponent = ({ updateUserApiRequest }) => {
                 isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
-                Please anter a valid password
+                Please Enter a valid password
               </Form.Control.Feedback>
               <Form.Text className="text-muted">
                 Password should have at least 6 characters
