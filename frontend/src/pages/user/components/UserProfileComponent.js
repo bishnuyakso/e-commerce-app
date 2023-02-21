@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 const UserProfileComponent = ({
   updateUserApiRequest,
   fetchUser,
-  userInfo,
+  userInfoFromRedux,
+  setReduxUserState,
+  reduxDispatch,
+  localStorage,
+  sessionStorage,
 }) => {
   const [validated, setValidated] = useState(false);
   const [updateUserResponseState, setUpdateUserResponseState] = useState({
@@ -13,11 +17,12 @@ const UserProfileComponent = ({
   });
   const [passwordsMatchState, setPasswordsMatchState] = useState(true);
   const [user, setUser] = useState({});
+  const userInfo = userInfoFromRedux;
 
   useEffect(() => {
     fetchUser(userInfo._id)
       .then((data) => setUser(data))
-      .catch((err) => console.log(err));
+      .catch((er) => console.log(er));
   }, [userInfo._id]);
 
   const onChange = () => {
@@ -36,6 +41,7 @@ const UserProfileComponent = ({
     event.preventDefault();
     event.stopPropagation();
     const form = event.currentTarget.elements;
+
     const firstName = form.firstName.value;
     const lastName = form.lastName.value;
     const phoneNumber = form.phoneNumber.value;
@@ -63,12 +69,28 @@ const UserProfileComponent = ({
       )
         .then((data) => {
           setUpdateUserResponseState({ success: data.success, error: "" });
+          reduxDispatch(
+            setReduxUserState({
+              doNotLogout: userInfo.doNotLogout,
+              ...data.userUpdated,
+            })
+          );
+          if (userInfo.doNotLogout)
+            localStorage.setItem(
+              "userInfo",
+              JSON.stringify({ doNotLogout: true, ...data.userUpdated })
+            );
+          else
+            sessionStorage.setItem(
+              "userInfo",
+              JSON.stringify({ doNotLogout: false, ...data.userUpdated })
+            );
         })
-        .catch((err) =>
+        .catch((er) =>
           setUpdateUserResponseState({
-            error: err.response.data.message
-              ? err.response.data.message
-              : err.response.data,
+            error: er.response.data.message
+              ? er.response.data.message
+              : er.response.data,
           })
         );
     }
@@ -109,7 +131,10 @@ const UserProfileComponent = ({
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 disabled
-                value={user.email + " if you want to change email, remove account and create new one with new email address"}
+                value={
+                  user.email +
+                  "  if you want to change email, remove account and create new one with new email address"
+                }
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicPhone">
@@ -178,7 +203,7 @@ const UserProfileComponent = ({
                 isInvalid={!passwordsMatchState}
               />
               <Form.Control.Feedback type="invalid">
-                Please Enter a valid password
+                Please anter a valid password
               </Form.Control.Feedback>
               <Form.Text className="text-muted">
                 Password should have at least 6 characters

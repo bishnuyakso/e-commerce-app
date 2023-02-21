@@ -10,6 +10,7 @@ import {
   Button,
   InputGroup,
 } from "react-bootstrap";
+
 import { LinkContainer } from "react-router-bootstrap";
 import { Link } from "react-router-dom";
 import { logout } from "../redux/actions/userActions";
@@ -17,14 +18,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Header = () => {
   const dispatch = useDispatch();
-  //to get the userInfo from the reducer
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
-
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
         <LinkContainer to="/">
-          <Navbar.Brand href="/">ONLINE SHOP</Navbar.Brand>
+          <Navbar.Brand href="/">BEST ONLINE SHOP</Navbar.Brand>
         </LinkContainer>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
@@ -35,15 +34,12 @@ const Header = () => {
                 <Dropdown.Item>Cars</Dropdown.Item>
                 <Dropdown.Item>Books</Dropdown.Item>
               </DropdownButton>
-
               <Form.Control type="text" placeholder="Search in shop ..." />
               <Button variant="warning">
-                <i className="bi bi-search"></i>
+                <i className="bi bi-search text-dark"></i>
               </Button>
             </InputGroup>
           </Nav>
-          
-          {/*All the userInfo from local storage value from reducer */}
           <Nav>
             {userInfo.isAdmin ? (
               <LinkContainer to="/admin/orders">
@@ -52,9 +48,9 @@ const Header = () => {
                   <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
                 </Nav.Link>
               </LinkContainer>
-            ) : userInfo.name && !userInfo.isAdmin ? (
+            ) : userInfo.firstName && !userInfo.isAdmin ? (
               <NavDropdown
-                title={`${userInfo.name} ${userInfo.lastName}`}
+                title={`${userInfo.firstName} ${userInfo.lastName}`}
                 id="collasible-nav-dropdown"
               >
                 <NavDropdown.Item
