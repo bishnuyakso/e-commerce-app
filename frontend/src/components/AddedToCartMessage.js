@@ -1,28 +1,30 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert, Button } from "react-bootstrap";
 
 import { Link } from "react-router-dom";
 
-export default function AddedToCartMessage() {
-  const [show, setShow] = useState(true);
+const AddedToCartMessage = ({ showCartMessage, setShowCartMessage }) => {
+  const navigate = useNavigate();
+    const goBack = () => {
+        navigate(-1);
+    }
 
-  if (show) {
-    return (
-      <Alert
-        show={show}
-        variant="success"
-        onClose={() => setShow(false)}
-        dismissible
-      >
-        <Alert.Heading>The product was added to your cart</Alert.Heading>
-        <p>
-          <Button variant="success">Go back</Button>{" "}
-          <Link to="/cart">
-            <Button variant="danger">Go to cart</Button>
-          </Link>
-        </p>
-      </Alert>
-    );
-  }
-  return <Button onClick={() => setShow(true)}>Show Alert</Button>;
-}
+  return (
+    <Alert
+      show={showCartMessage}
+      variant="success"
+      onClose={() => setShowCartMessage(false)}
+      dismissible
+    >
+      <Alert.Heading>The product was added to your cart!</Alert.Heading>
+      <p>
+        <Button variant="success" onClick={goBack}>Go back</Button>{" "}
+        <Link to="/cart">
+          <Button variant="danger">Go to cart</Button>
+        </Link>
+      </p>
+    </Alert>
+  );
+};
+
+export default AddedToCartMessage;
