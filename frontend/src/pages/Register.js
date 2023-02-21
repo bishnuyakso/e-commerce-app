@@ -10,6 +10,8 @@ const registerUserApiRequest = async (firstName, lastName, email, password) => {
     email,
     password,
   });
+  sessionStorage.setItem("userInfo", JSON.stringify(data.userCreated));
+  if (data.success === "User created") window.location.href = "/user";
 
   return data;
 };
