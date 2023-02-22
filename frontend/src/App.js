@@ -59,7 +59,10 @@ function App() {
             <Route path="/user" element={<UserProfile />} />
             <Route path="/user/my-orders" element={<UserOrder />} />
             <Route path="/user/cart-details" element={<UserCartDetails />} />
-            <Route path="/user/order-details/:id" element={<UserOrderDetails />} />
+            <Route
+              path="/user/order-details/:id"
+              element={<UserOrderDetails />}
+            />
           </Route>
 
           {/* Admin protected routes: */}
@@ -72,7 +75,10 @@ function App() {
               path="/admin/create-new-product"
               element={<AdminCreateProduct />}
             />
-            <Route path="/admin/edit-product" element={<AdminEditProduct />} />
+            <Route
+              path="/admin/edit-product/:id"
+              element={<AdminEditProduct />}
+            />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route
               path="/admin/order-details/:id"

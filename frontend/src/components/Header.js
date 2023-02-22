@@ -15,11 +15,17 @@ import { LinkContainer } from "react-router-bootstrap";
 import { Link } from "react-router-dom";
 import { logout } from "../redux/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getCategories } from "../redux/actions/categoryActions";
 
-const Header = () => {
+const HeaderComponent = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
-  const itemsCount = useSelector((state) => state.cart.itemsCount);
+    const itemsCount = useSelector((state) => state.cart.itemsCount);
+
+    useEffect(() => {
+       dispatch(getCategories()); 
+    }, [dispatch])
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -50,11 +56,8 @@ const Header = () => {
                   <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
                 </Nav.Link>
               </LinkContainer>
-            ) : userInfo.firstName && !userInfo.isAdmin ? (
-              <NavDropdown
-                title={`${userInfo.firstName} ${userInfo.lastName}`}
-                id="collasible-nav-dropdown"
-              >
+            ) : userInfo.name && !userInfo.isAdmin ? (
+              <NavDropdown title={`${userInfo.name} ${userInfo.lastName}`} id="collasible-nav-dropdown">
                 <NavDropdown.Item
                   eventKey="/user/my-orders"
                   as={Link}
@@ -96,4 +99,5 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default HeaderComponent;
+
