@@ -21,11 +21,11 @@ import { getCategories } from "../redux/actions/categoryActions";
 const HeaderComponent = () => {
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.userRegisterLogin);
-    const itemsCount = useSelector((state) => state.cart.itemsCount);
+  const itemsCount = useSelector((state) => state.cart.itemsCount);
 
-    useEffect(() => {
-       dispatch(getCategories()); 
-    }, [dispatch])
+  useEffect(() => {
+    dispatch(getCategories());
+  }, [dispatch]);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -56,8 +56,11 @@ const HeaderComponent = () => {
                   <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
                 </Nav.Link>
               </LinkContainer>
-            ) : userInfo.name && !userInfo.isAdmin ? (
-              <NavDropdown title={`${userInfo.name} ${userInfo.lastName}`} id="collasible-nav-dropdown">
+            ) : userInfo.firstName && !userInfo.isAdmin ? (
+              <NavDropdown
+                title={`${userInfo.firstName} ${userInfo.lastName}`}
+                id="collasible-nav-dropdown"
+              >
                 <NavDropdown.Item
                   eventKey="/user/my-orders"
                   as={Link}
@@ -100,4 +103,3 @@ const HeaderComponent = () => {
 };
 
 export default HeaderComponent;
-
