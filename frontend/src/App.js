@@ -59,7 +59,7 @@ function App() {
             <Route path="/user" element={<UserProfile />} />
             <Route path="/user/my-orders" element={<UserOrder />} />
             <Route path="/user/cart-details" element={<UserCartDetails />} />
-            <Route path="/user/order-details" element={<UserOrderDetails />} />
+            <Route path="/user/order-details/:id" element={<UserOrderDetails />} />
           </Route>
 
           {/* Admin protected routes: */}

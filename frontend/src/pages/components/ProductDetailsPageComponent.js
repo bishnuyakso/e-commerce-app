@@ -82,7 +82,7 @@ const ProductDetailsPageComponent = ({
                   <Rating readonly size={20} initialValue={4} /> (1)
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  Price <span className="fw-bold">$345</span>
+                  Price <span className="fw-bold">$</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   Porta ac consectetur ac Lorem ipsum dolor, sit amet
