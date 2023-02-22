@@ -8,14 +8,14 @@ import {
   Button,
 } from "react-bootstrap";
 import CartItemComponent from "../../../components/CartItemComponent";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 const UserOrderDetailsPageComponent = ({
   userInfo,
   getUser,
   getOrder,
-  loadScript,
+  loadPayPalScript,
 }) => {
   const [userAddress, setUserAddress] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -25,6 +25,9 @@ const UserOrderDetailsPageComponent = ({
   const [cartSubtotal, setCartSubtotal] = useState(0);
   const [isDelivered, setIsDelivered] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false);
+
+  const paypalContainer = useRef();
+
 
   const { id } = useParams();
 
@@ -54,7 +57,7 @@ const UserOrderDetailsPageComponent = ({
           : setIsDelivered(false);
         data.isPaid ? setIsPaid(data.paidAt) : setIsPaid(false);
         if (data.isPaid) {
-          setOrderButtonMessage("Your order is finished");
+          setOrderButtonMessage("Your order has completed");
           setButtonDisabled(true);
         } else {
           if (data.paymentMethod === "pp") {
@@ -75,21 +78,19 @@ const UserOrderDetailsPageComponent = ({
         "To pay for your order click one of the buttons below"
       );
       if (!isPaid) {
-        loadScript({
-          "client-id":
-            "AXXvsO52YhJJ-L_vKClj0O5XRPTxm4rXNcVliX4IkeXzQ2nJanNoEdZWtolGZt0ir__bOdv4Js4bGUQo",
-        })
-          .then((paypal) => {
-            console.log(paypal);
-          })
-          .catch((err) => {
-            console.error("failed to load the PayPal JS SDK script", err);
-          });
+        loadPayPalScript(cartSubtotal, cartItems, id, updateStateAfterOrder)
       }
     } else {
       setOrderButtonMessage("Your order was placed. Thank you");
     }
   };
+
+  const updateStateAfterOrder = (paidAt) => {
+      setOrderButtonMessage("Thank you for your payment!");
+      setIsPaid(paidAt);
+      setButtonDisabled(true);
+      paypalContainer.current.style = "display: none";
+  }
 
   return (
     <Container fluid>
@@ -172,6 +173,9 @@ const UserOrderDetailsPageComponent = ({
                   {orderButtonMessage}
                 </Button>
               </div>
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <div ref={paypalContainer} id="paypal-container-element"></div>
+              </div>
             </ListGroup.Item>
           </ListGroup>
         </Col>
@@ -179,4 +183,6 @@ const UserOrderDetailsPageComponent = ({
     </Container>
   );
 };
+
 export default UserOrderDetailsPageComponent;
+
