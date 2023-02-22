@@ -26,6 +26,10 @@ const EditProductPageComponent = ({
   categories,
   fetchProduct,
   updateProductApiRequest,
+  reduxDispatch,
+  saveAttributeToCatDoc,
+  imageDeleteHandler,
+  uploadHandler
 }) => {
   const [validated, setValidated] = useState(false);
   const [product, setProduct] = useState({});
@@ -35,9 +39,17 @@ const EditProductPageComponent = ({
   });
   const [attributesFromDb, setAttributesFromDb] = useState([]); // for select lists
   const [attributesTable, setAttributesTable] = useState([]); // for html table
+  const [categoryChoosen, setCategoryChoosen] = useState("Choose category");
+  const [newAttrKey, setNewAttrKey] = useState(false);
+  const [newAttrValue, setNewAttrValue] = useState(false);
+  const [imageRemoved, setImageRemoved] = useState(false)
+  const [isUploading, setIsUploading] = useState("");
+  const [imageUploaded, setImageUploaded] = useState(false);
 
   const attrVal = useRef(null);
   const attrKey = useRef(null);
+  const createNewAttrKey = useRef(null);
+  const createNewAttrVal = useRef(null);
 
   const setValuesForAttrFromDbSelectForm = (e) => {
     if (e.target.value !== "Choose attribute") {
@@ -66,7 +78,7 @@ const EditProductPageComponent = ({
     fetchProduct(id)
       .then((product) => setProduct(product))
       .catch((er) => console.log(er));
-  }, [id]);
+  }, [id, imageRemoved, imageUploaded]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -79,7 +91,7 @@ const EditProductPageComponent = ({
       count: form.count.value,
       price: form.price.value,
       category: form.category.value,
-      attributesTable: [],
+      attributesTable: attributesTable,
     };
 
     if (event.currentTarget.checkValidity() === true) {
@@ -117,6 +129,7 @@ const EditProductPageComponent = ({
         setAttributesFromDb(mainCategoryOfEditedProductAllData.attrs);
       }
     }
+    setCategoryChoosen(product.category);
     setAttributesTable(product.attrs);
   }, [product]);
 
@@ -130,38 +143,69 @@ const EditProductPageComponent = ({
     } else {
       setAttributesFromDb([]);
     }
+    setCategoryChoosen(e.target.value);
   };
 
   const attributeValueSelected = (e) => {
-    if (e.target.value !== "Choose attribute value") {
-      setAttributesTableWrapper(attrKey.current.value, e.target.value);
-    }
-  };
+      if (e.target.value !== "Choose attribute value") {
+          setAttributesTableWrapper(attrKey.current.value, e.target.value);
+      }
+  }
 
   const setAttributesTableWrapper = (key, val) => {
-    setAttributesTable((attr) => {
-      if (attr.length !== 0) {
-        var keyExistsInOldTable = false;
-        let modifiedTable = attr.map((item) => {
-          if (item.key === key) {
-            keyExistsInOldTable = true;
-            item.value = val;
-            return item;
+      setAttributesTable((attr) => {
+          if (attr.length !== 0) {
+              var keyExistsInOldTable = false;
+              let modifiedTable = attr.map(item => {
+                  if (item.key === key) {
+                      keyExistsInOldTable = true;
+                      item.value = val;
+                      return item;
+                  } else {
+                      return item;
+                  }
+              })
+              if (keyExistsInOldTable) return [...modifiedTable];
+              else return [...modifiedTable, { key: key, value: val }];
           } else {
-            return item;
+             return [{ key: key, value: val }]; 
           }
-        });
-        if (keyExistsInOldTable) return [...modifiedTable];
-        else return [...modifiedTable, { key: key, value: val }];
-      } else {
-        return [{ key: key, value: val }];
-      }
-    });
-  };
+      })
+  }
 
   const deleteAttribute = (key) => {
-    setAttributesTable((table) => table.filter((item) => item.key !== key));
-  };
+      setAttributesTable((table) => table.filter((item) => item.key !== key));
+  }
+
+  const checkKeyDown = (e) => {
+      if (e.code === "Enter") e.preventDefault();
+  }
+
+  const newAttrKeyHandler = (e) => {
+      e.preventDefault();
+      setNewAttrKey(e.target.value);
+      addNewAttributeManually(e);
+  }
+
+  const newAttrValueHandler = (e) => {
+      e.preventDefault();
+      setNewAttrValue(e.target.value);
+      addNewAttributeManually(e);
+  }
+
+  const addNewAttributeManually = (e) => {
+      if (e.keyCode && e.keyCode === 13) {
+          if (newAttrKey && newAttrValue) {
+              reduxDispatch(saveAttributeToCatDoc(newAttrKey, newAttrValue, categoryChoosen));
+             setAttributesTableWrapper(newAttrKey, newAttrValue);
+             e.target.value = "";
+             createNewAttrKey.current.value = "";
+             createNewAttrVal.current.value = "";
+             setNewAttrKey(false);
+             setNewAttrValue(false);
+          }
+      }
+  }
 
   return (
     <Container>
@@ -173,7 +217,7 @@ const EditProductPageComponent = ({
         </Col>
         <Col md={6}>
           <h1>Edit product</h1>
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
+          <Form noValidate validated={validated} onSubmit={handleSubmit} onKeyDown={(e) => checkKeyDown(e)}>
             <Form.Group className="mb-3" controlId="formBasicName">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -223,7 +267,7 @@ const EditProductPageComponent = ({
                 aria-label="Default select example"
                 onChange={changeCategory}
               >
-                <option value="">Choose category</option>
+                <option value="Choose category">Choose category</option>
                 {categories.map((category, idx) => {
                   return product.category === category.name ? (
                     <option selected key={idx} value={category.name}>
@@ -293,9 +337,7 @@ const EditProductPageComponent = ({
                         <td>{item.key}</td>
                         <td>{item.value}</td>
                         <td>
-                          <CloseButton
-                            onClick={() => deleteAttribute(item.key)}
-                          />
+                          <CloseButton onClick={() => deleteAttribute(item.key)} />
                         </td>
                       </tr>
                     ))}
@@ -309,10 +351,13 @@ const EditProductPageComponent = ({
                 <Form.Group className="mb-3" controlId="formBasicNewAttribute">
                   <Form.Label>Create new attribute</Form.Label>
                   <Form.Control
-                    disabled={false}
+                  ref={createNewAttrKey}
+                    disabled={categoryChoosen === "Choose category"}
                     placeholder="first choose or create category"
-                    name="newAttrValue"
+                    name="newAttrKey"
                     type="text"
+                    onKeyUp={newAttrKeyHandler}
+                    required={newAttrValue}
                   />
                 </Form.Group>
               </Col>
@@ -323,17 +368,19 @@ const EditProductPageComponent = ({
                 >
                   <Form.Label>Attribute value</Form.Label>
                   <Form.Control
-                    disabled={false}
+                  ref={createNewAttrVal}
+                    disabled={categoryChoosen === "Choose category"}
                     placeholder="first choose or create category"
-                    required={true}
+                    required={newAttrKey}
                     name="newAttrValue"
                     type="text"
+                    onKeyUp={newAttrValueHandler}
                   />
                 </Form.Group>
               </Col>
             </Row>
 
-            <Alert variant="primary">
+            <Alert show={newAttrKey && newAttrValue} variant="primary">
               After typing attribute key and value press enterr on one of the
               field
             </Alert>
@@ -349,11 +396,20 @@ const EditProductPageComponent = ({
                         src={image.path ?? null}
                         fluid
                       />
-                      <i style={onHover} className="bi bi-x text-danger"></i>
+                      <i style={onHover} onClick={() => imageDeleteHandler(image.path, id).then(data => setImageRemoved(!imageRemoved))} className="bi bi-x text-danger"></i>
                     </Col>
                   ))}
               </Row>
-              <Form.Control required type="file" multiple />
+              <Form.Control required type="file" multiple onChange={e => {
+                 setIsUploading("upload files in progress ..."); 
+                 uploadHandler(e.target.files, id)
+                 .then(data => {
+                    setIsUploading("upload file completed"); 
+                    setImageUploaded(!imageUploaded);
+                 })
+                 .catch((er) => setIsUploading(er.response.data.message ? er.response.data.message : er.response.data));
+              }} />
+               {isUploading}
             </Form.Group>
             <Button variant="primary" type="submit">
               UPDATE
@@ -367,3 +423,4 @@ const EditProductPageComponent = ({
 };
 
 export default EditProductPageComponent;
+

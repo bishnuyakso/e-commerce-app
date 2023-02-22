@@ -216,6 +216,16 @@ const adminUpdateProduct = async (req, res, next) => {
 
 //Admin file upload or image upload
 const adminUpload = async (req, res, next) => {
+  if (req.query.cloudinary === "true") {
+    try {
+        let product = await Product.findById(req.query.productId).orFail();
+        product.images.push({ path: req.body.url });
+        await product.save();
+    } catch (err) {
+        next(err);
+    }
+   return 
+}
   try {
     if (!req.files || !!req.files.images === false) {
       return res.status(400).send("No files were uploaded.");
@@ -235,6 +245,7 @@ const adminUpload = async (req, res, next) => {
       "images",
       "products"
     );
+    console.log("uploadDirector: " + uploadDirectory);
 
     let product = await Product.findById(req.query.productId).orFail();
 
@@ -249,9 +260,10 @@ const adminUpload = async (req, res, next) => {
       var fileName = uuidv4() + path.extname(image.name);
       var uploadPath = uploadDirectory + "/" + fileName;
       product.images.push({ path: "/images/products/" + fileName });
-
+      console.log("uploadPath: " + uploadPath);
       image.mv(uploadPath, function (error) {
         if (error) {
+          console.error(error);
           return res.status(500).send(error);
         }
       });
@@ -259,6 +271,7 @@ const adminUpload = async (req, res, next) => {
     await product.save();
     return res.send("Files uploaded!");
   } catch (err) {
+    console.error(err);
     next(err);
   }
 };

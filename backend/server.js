@@ -1,7 +1,6 @@
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
-const cors = require("cors");
 const app = express();
 const port = 8080;
 
@@ -9,7 +8,7 @@ const port = 8080;
 app.use(express.json());
 app.use(fileUpload());
 app.use(cookieParser());
-app.use(cors());
+
 const apiRoutes = require("./routes/apiRoutes");
 
 app.get("/", async (req, res, next) => {
