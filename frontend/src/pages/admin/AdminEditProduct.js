@@ -8,6 +8,13 @@ const fetchProduct = async (productId) => {
   return data;
 };
 
+const updateProductApiRequest = async (productId, formInputs) => {
+  const { data } = await axios.put(`/api/products/admin/${productId}`, {
+    ...formInputs,
+  });
+  return data;
+};
+
 const AdminEditProduct = () => {
   const { categories } = useSelector((state) => state.getCategories);
 
@@ -15,6 +22,7 @@ const AdminEditProduct = () => {
     <EditProductPageComponent
       categories={categories}
       fetchProduct={fetchProduct}
+      updateProductApiRequest={updateProductApiRequest}
     />
   );
 };
