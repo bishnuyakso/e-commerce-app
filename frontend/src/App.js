@@ -44,7 +44,7 @@ function App() {
           <Route element={<RoutesWithUserChat />}>
             {/* publicly available routes */}
             <Route path="/" element={<Home />} />
-            <Route path="/product-list" element={<ProductList />} />
+            <Route path="/product-list/category/:categoryName" element={<ProductList />} />
             <Route path="/product-details" element={<ProductDetails />} />
             <Route path="/product-details/:id" element={<ProductDetails />} />
             <Route path="/login" element={<Login />} />
