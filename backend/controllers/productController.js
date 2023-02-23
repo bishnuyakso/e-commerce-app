@@ -283,8 +283,8 @@ const adminDeleteProductImage = async (req, res, next) => {
         try {
            await Product.findOneAndUpdate({ _id: req.params.productId }, { $pull: { images: { path: imagePath } } }).orFail(); 
             return res.end();
-        } catch(er) {
-            next(er);
+        } catch(err) {
+            next(err);
         }
         return
     }
