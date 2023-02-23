@@ -15,6 +15,7 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [attrsFilter, setAttrsFilter] = useState([]);
+  const [attrsFromFilter, setAttrsFromFilter] = useState([]);
 
   const { categoryName } = useParams() || "";
 
@@ -62,7 +63,7 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
               <CategoryFilter />
             </ListGroup.Item>
             <ListGroup.Item>
-              <AttributesFilter attrsFilter={attrsFilter}  />
+            <AttributesFilter attrsFilter={attrsFilter} setAttrsFromFilter={setAttrsFromFilter}  />
             </ListGroup.Item>
             <ListGroup.Item>
               <Button variant="primary">Filter</Button>{" "}
