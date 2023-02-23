@@ -5,7 +5,7 @@ const Footer = () => {
       <Container fluid>
         <Row className="mt-5">
           <Col className="bg-dark text-white text-center py-5">
-            Copyright &copy; Online Shop
+            Copyright &copy; DealSplice
           </Col>
         </Row>
       </Container>
