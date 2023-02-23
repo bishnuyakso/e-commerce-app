@@ -1,6 +1,7 @@
 import { Form } from "react-bootstrap";
 
-const AttributesFilter = () => {
+const AttributesFilterComponent = ({attrsFilter}) => {
+    console.log(attrsFilter);
   return (
     <>
       {[{ color: ["red", "blue", "green"] }, { ram: ["1 TB", "2 TB"] }].map(
@@ -19,4 +20,5 @@ const AttributesFilter = () => {
   );
 };
 
-export default AttributesFilter;
+export default AttributesFilterComponent;
+

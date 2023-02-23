@@ -1,17 +1,35 @@
 import { Row, Col, Container, ListGroup, Button } from "react-bootstrap";
-import SortOptions from "../../components/SortOptions";
-import PriceFilter from "../../components/filterQueryOptions/PriceFilter";
-import RatingFilter from "../../components/filterQueryOptions/RatingFilter";
-import CategoryFilter from "../../components/filterQueryOptions/CategoryFilter";
-import AttributesFilter from "../../components/filterQueryOptions/AttributesFilter";
-import ProductForList from "../../components/ProductForList";
 import PaginationPage from "../../components/PaginationPage";
-import { useEffect, useState } from "react";
+import ProductForList from "../../components/ProductForList";
+import SortOptions from "../../components/SortOptions";
+import PriceFilter from "../../components/filterQueryResultOptions/PriceFilter";
+import RatingFilter from "../../components/filterQueryResultOptions/RatingFilter";
+import CategoryFilter from "../../components/filterQueryResultOptions/CategoryFilter";
+import AttributesFilter from "../../components/filterQueryResultOptions/AttributesFilter";
 
-const ProductListPageComponent = ({ getProducts }) => {
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+const ProductListPageComponent = ({ getProducts, categories }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [attrsFilter, setAttrsFilter] = useState([]);
+
+  const { categoryName } = useParams() || "";
+
+  useEffect(() => {
+      if (categoryName) {
+          let categoryAllData = categories.find((item) => item.name === categoryName.replaceAll(",", "/"));
+          if (categoryAllData) {
+              let mainCategory = categoryAllData.name.split("/")[0];
+              let index = categories.findIndex((item) => item.name === mainCategory);
+              setAttrsFilter(categories[index].attrs);
+          }
+      } else {
+          setAttrsFilter([]);
+      }
+  }, [categoryName, categories])
 
   useEffect(() => {
     getProducts()
@@ -44,7 +62,7 @@ const ProductListPageComponent = ({ getProducts }) => {
               <CategoryFilter />
             </ListGroup.Item>
             <ListGroup.Item>
-              <AttributesFilter />
+              <AttributesFilter attrsFilter={attrsFilter}  />
             </ListGroup.Item>
             <ListGroup.Item>
               <Button variant="primary">Filter</Button>{" "}
@@ -79,3 +97,4 @@ const ProductListPageComponent = ({ getProducts }) => {
 };
 
 export default ProductListPageComponent;
+
