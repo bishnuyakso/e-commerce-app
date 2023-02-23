@@ -8,20 +8,28 @@ import CategoryFilter from "../../components/filterQueryResultOptions/CategoryFi
 import AttributesFilter from "../../components/filterQueryResultOptions/AttributesFilter";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 const ProductListPageComponent = ({ getProducts, categories }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [attrsFilter, setAttrsFilter] = useState([]);// collect category attributes from db and show on the webpage
-  const [attrsFromFilter, setAttrsFromFilter] = useState([]);// collect user filters for category attributes
+  const [attrsFilter, setAttrsFilter] = useState([]); // collect category attributes from db and show on the webpage
+  const [attrsFromFilter, setAttrsFromFilter] = useState([]); // collect user filters for category attributes
   const [showResetFiltersButton, setShowResetFiltersButton] = useState(false);
   const [filters, setFilters] = useState({}); //collect all filters
   const [price, setPrice] = useState(500);
   const [ratingsFromFilter, setRatingsFromFilter] = useState({});
+  const [categoriesFromFilter, setCategoriesFromFilter] = useState({});
+  const [sortOption, setSortOption] = useState("");
+  const [paginationLinksNumber, setPaginationLinksNumber] = useState(null);
+  const [pageNum, setPageNum] = useState(null);
 
   const { categoryName } = useParams() || "";
+  const { pageNumParam } = useParams() || 1;
+  const { searchQuery } = useParams() || "";
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (categoryName) {
@@ -39,33 +47,54 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
   }, [categoryName, categories]);
 
   useEffect(() => {
-    getProducts()
+    if (Object.entries(categoriesFromFilter).length > 0) {
+      setAttrsFilter([]);
+      var cat = [];
+      var count;
+      Object.entries(categoriesFromFilter).forEach(([category, checked]) => {
+        if (checked) {
+          var name = category.split("/")[0];
+          cat.push(name);
+          count = cat.filter((x) => x === name).length;
+          if (count === 1) {
+            var index = categories.findIndex((item) => item.name === name);
+            setAttrsFilter((attrs) => [...attrs, ...categories[index].attrs]);
+          }
+        }
+      });
+    }
+  }, [categoriesFromFilter, categories]);
+
+  useEffect(() => {
+    getProducts(categoryName, pageNumParam, searchQuery, filters, sortOption)
       .then((products) => {
         setProducts(products.products);
+        setPaginationLinksNumber(products.paginationLinksNumber);
+        setPageNum(products.pageNum);
         setLoading(false);
       })
       .catch((er) => {
         console.log(er);
         setError(true);
       });
-      console.log(filters);
-  }, [filters]);
+  }, [categoryName, pageNumParam, searchQuery, filters, sortOption]);
 
   const handleFilters = () => {
+    navigate(location.pathname.replace(/\/[0-9]+$/, ""));
     setShowResetFiltersButton(true);
     setFilters({
-        price: price,
-        rating: ratingsFromFilter,
-        attrs: attrsFromFilter,
-    })
-}
+      price: price,
+      rating: ratingsFromFilter,
+      category: categoriesFromFilter,
+      attrs: attrsFromFilter,
+    });
+  };
 
-const resetFilters = () => {
+  const resetFilters = () => {
     setShowResetFiltersButton(false);
     setFilters({});
     window.location.href = "/product-list";
-}
-
+  };
 
   return (
     <Container fluid>
@@ -73,18 +102,23 @@ const resetFilters = () => {
         <Col md={3}>
           <ListGroup variant="flush">
             <ListGroup.Item className="mb-3 mt-3">
-              <SortOptions />
+              <SortOptions setSortOption={setSortOption} />
             </ListGroup.Item>
             <ListGroup.Item>
               FILTER: <br />
-              <PriceFilter price={price} setPrice={setPrice}/>
+              <PriceFilter price={price} setPrice={setPrice} />
             </ListGroup.Item>
             <ListGroup.Item>
-            <RatingFilter setRatingsFromFilter={setRatingsFromFilter} />
+              <RatingFilter setRatingsFromFilter={setRatingsFromFilter} />
             </ListGroup.Item>
-            <ListGroup.Item>
-              <CategoryFilter />
-            </ListGroup.Item>
+            {!location.pathname.match(/\/category/) && (
+              <ListGroup.Item>
+                <CategoryFilter
+                  setCategoriesFromFilter={setCategoriesFromFilter}
+                />
+              </ListGroup.Item>
+            )}
+
             <ListGroup.Item>
               <AttributesFilter
                 attrsFilter={attrsFilter}
@@ -92,9 +126,13 @@ const resetFilters = () => {
               />
             </ListGroup.Item>
             <ListGroup.Item>
-            <Button variant="primary" onClick={handleFilters}>Filter</Button>{" "}
+              <Button variant="primary" onClick={handleFilters}>
+                Filter
+              </Button>{" "}
               {showResetFiltersButton && (
-                <Button onClick={resetFilters} variant="danger">Reset filters</Button>
+                <Button onClick={resetFilters} variant="danger">
+                  Reset filters
+                </Button>
               )}
             </ListGroup.Item>
           </ListGroup>
@@ -118,7 +156,14 @@ const resetFilters = () => {
               />
             ))
           )}
-          <PaginationPage />
+          {paginationLinksNumber > 1 ? (
+            <PaginationPage
+              categoryName={categoryName}
+              searchQuery={searchQuery}
+              paginationLinksNumber={paginationLinksNumber}
+              pageNum={pageNum}
+            />
+          ) : null}
         </Col>
       </Row>
     </Container>
