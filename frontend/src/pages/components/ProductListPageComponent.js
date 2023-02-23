@@ -16,21 +16,28 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
   const [error, setError] = useState(false);
   const [attrsFilter, setAttrsFilter] = useState([]);
   const [attrsFromFilter, setAttrsFromFilter] = useState([]);
+  const [showResetFiltersButton, setShowResetFiltersButton] = useState(false);
+ 
 
+
+  const [filters, setFilters] = useState({});
+console.log(filters);
   const { categoryName } = useParams() || "";
 
   useEffect(() => {
-      if (categoryName) {
-          let categoryAllData = categories.find((item) => item.name === categoryName.replaceAll(",", "/"));
-          if (categoryAllData) {
-              let mainCategory = categoryAllData.name.split("/")[0];
-              let index = categories.findIndex((item) => item.name === mainCategory);
-              setAttrsFilter(categories[index].attrs);
-          }
-      } else {
-          setAttrsFilter([]);
+    if (categoryName) {
+      let categoryAllData = categories.find(
+        (item) => item.name === categoryName.replaceAll(",", "/")
+      );
+      if (categoryAllData) {
+        let mainCategory = categoryAllData.name.split("/")[0];
+        let index = categories.findIndex((item) => item.name === mainCategory);
+        setAttrsFilter(categories[index].attrs);
       }
-  }, [categoryName, categories])
+    } else {
+      setAttrsFilter([]);
+    }
+  }, [categoryName, categories]);
 
   useEffect(() => {
     getProducts()
@@ -43,6 +50,20 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
         setError(true);
       });
   }, []);
+
+  const handleFilters = () => {
+    setShowResetFiltersButton(true);
+    setFilters({
+        attrs: attrsFromFilter,
+    })
+}
+
+const resetFilters = () => {
+    setShowResetFiltersButton(false);
+    setFilters({});
+    window.location.href = "/product-list";
+}
+
 
   return (
     <Container fluid>
@@ -63,11 +84,16 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
               <CategoryFilter />
             </ListGroup.Item>
             <ListGroup.Item>
-            <AttributesFilter attrsFilter={attrsFilter} setAttrsFromFilter={setAttrsFromFilter}  />
+              <AttributesFilter
+                attrsFilter={attrsFilter}
+                setAttrsFromFilter={setAttrsFromFilter}
+              />
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button variant="primary">Filter</Button>{" "}
-              <Button variant="danger">Reset filters</Button>
+            <Button variant="primary" onClick={handleFilters}>Filter</Button>{" "}
+              {showResetFiltersButton && (
+                <Button onClick={resetFilters} variant="danger">Reset filters</Button>
+              )}
             </ListGroup.Item>
           </ListGroup>
         </Col>
@@ -98,4 +124,3 @@ const ProductListPageComponent = ({ getProducts, categories }) => {
 };
 
 export default ProductListPageComponent;
-
