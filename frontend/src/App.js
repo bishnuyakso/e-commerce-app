@@ -41,7 +41,7 @@ function App() {
         <Header />
 
         <Routes>
-          <Route > 
+          <Route>
             {/* publicly available routes */}
             <Route path="/" element={<Home />} />
             <Route path="/product-list" element={<ProductList />} />
