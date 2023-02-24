@@ -8,8 +8,8 @@ const PriceFilter = ({ price, setPrice }) => {
       </Form.Label>
       <Form.Range
         min={10}
-        max={1000}
-        step={10}
+        max={5000}
+        step={5}
         onChange={(e) => setPrice(e.target.value)}
       />
     </>

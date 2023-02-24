@@ -84,7 +84,7 @@ const HeaderComponent = () => {
                 onKeyUp={submitHandler}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 type="text"
-                placeholder="Search in shop ..."
+                placeholder="Search in  ..."
               />
               <Button onClick={submitHandler} variant="warning">
                 <i className="bi bi-search text-dark"></i>
@@ -96,7 +96,7 @@ const HeaderComponent = () => {
               <LinkContainer to="/admin/orders">
                 <Nav.Link>
                   Admin
-                  <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                  {/* <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span> todo */ } 
                 </Nav.Link>
               </LinkContainer>
             ) : userInfo.firstName && !userInfo.isAdmin ? (
